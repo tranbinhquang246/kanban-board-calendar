@@ -6,7 +6,11 @@ Are you looking for a fun and practical project to improve your React skills? Do
 
 I’ve just uploaded a new video where I show you how to build a kanban board from scratch using React, TypeScript, TailwindCSS and dnd-kit.
 
-[![dnd_tutorial_thumbnail](https://github.com/Kliton/react-kanban-board-dnd-kit-tutorial-yt/assets/10452377/32809103-d217-41c1-b618-083686b91144)]([https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE](https://youtu.be/RG-3R6Pu_Ik))
+![dnd_tutorial_thumbnail](https://github.com/Kliton/react-kanban-board-dnd-kit-tutorial-yt/assets/10452377/1321f859-105a-4fd2-a462-3745c89e410a)
+
+[Demo](https://react-kanban-board-dnd-kit-tutorial-yt.vercel.app/)
+[Video tutorial](https://youtu.be/RG-3R6Pu_Ik)
+
 
 In this video, you will learn how to:
 
