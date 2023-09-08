@@ -2,7 +2,7 @@ export type Id = string | number;
 
 export type Column = {
   id: Id;
-  title: string;
+  title: Id;
 };
 
 export type Task = {

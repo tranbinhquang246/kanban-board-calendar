@@ -47,7 +47,7 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
         style={style}
         className="
         opacity-30
-      bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-rose-500  cursor-grab relative
+      bg-gray-600 p-2.5 h-[50px] min-h-[50px] items-center flex text-left border-solid border-rose-500  cursor-grab relative
       "
       />
     );
@@ -60,12 +60,12 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
         style={style}
         {...attributes}
         {...listeners}
-        className="bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative"
+        className="bg-white border border-black text-xs text-black p-2.5 h-[50px] min-h-[50px] items-center flex text-left cursor-grab relative"
       >
         <textarea
           className="
         h-[90%]
-        w-full resize-none border-none rounded bg-transparent text-white focus:outline-none
+        w-full resize-none border-none  bg-transparent text-black focus:outline-none
         "
           value={task.content}
           autoFocus
@@ -89,7 +89,7 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
       {...attributes}
       {...listeners}
       onClick={toggleEditMode}
-      className="bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative task"
+      className="bg-white border border-solid border-black text-black p-2.5 h-[50px] min-h-[50px] items-center flex text-left   cursor-grab relative task"
       onMouseEnter={() => {
         setMouseIsOver(true);
       }}
@@ -97,20 +97,20 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
         setMouseIsOver(false);
       }}
     >
-      <p className="my-auto h-[90%] w-full overflow-y-auto overflow-x-hidden whitespace-pre-wrap">
+      <p className="my-auto h-[100%] bg-white w-full text-black text-xs overflow-y-auto overflow-x-hidden whitespace-pre-wrap">
         {task.content}
       </p>
 
-      {mouseIsOver && (
+      {/* {mouseIsOver && (
         <button
           onClick={() => {
             deleteTask(task.id);
           }}
-          className="stroke-white absolute right-4 top-1/2 -translate-y-1/2 bg-columnBackgroundColor p-2 rounded opacity-60 hover:opacity-100"
+          className="stroke-white w-[20%] bg-gray-500 absolute right-4 top-1/2 -translate-y-1/2 bg-gr p-2 rounded opacity-60 hover:opacity-100"
         >
           <TrashIcon />
         </button>
-      )}
+      )} */}
     </div>
   );
 }

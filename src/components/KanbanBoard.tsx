@@ -3,347 +3,408 @@ import { useMemo, useState } from "react";
 import { Column, Id, Task } from "../types";
 import ColumnContainer from "./ColumnContainer";
 import {
-  DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
+    DndContext,
+    DragEndEvent,
+    DragOverEvent,
+    DragOverlay,
+    DragStartEvent,
+    PointerSensor,
+    useSensor,
+    useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
+import {
+    getNumberOfDaysInCurrentMonth,
+    createArrayOfObjects,
+} from "../components/utils/index";
 
-const defaultCols: Column[] = [
-  {
-    id: "todo",
-    title: "Todo",
-  },
-  {
-    id: "doing",
-    title: "Work in progress",
-  },
-  {
-    id: "done",
-    title: "Done",
-  },
-];
+const countDay = getNumberOfDaysInCurrentMonth();
+const defaultCols: Column[] = createArrayOfObjects(countDay / 2);
 
 const defaultTasks: Task[] = [
-  {
-    id: "1",
-    columnId: "todo",
-    content: "List admin APIs for dashboard",
-  },
-  {
-    id: "2",
-    columnId: "todo",
-    content:
-      "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
-  },
-  {
-    id: "3",
-    columnId: "doing",
-    content: "Conduct security testing",
-  },
-  {
-    id: "4",
-    columnId: "doing",
-    content: "Analyze competitors",
-  },
-  {
-    id: "5",
-    columnId: "done",
-    content: "Create UI kit documentation",
-  },
-  {
-    id: "6",
-    columnId: "done",
-    content: "Dev meeting",
-  },
-  {
-    id: "7",
-    columnId: "done",
-    content: "Deliver dashboard prototype",
-  },
-  {
-    id: "8",
-    columnId: "todo",
-    content: "Optimize application performance",
-  },
-  {
-    id: "9",
-    columnId: "todo",
-    content: "Implement data validation",
-  },
-  {
-    id: "10",
-    columnId: "todo",
-    content: "Design database schema",
-  },
-  {
-    id: "11",
-    columnId: "todo",
-    content: "Integrate SSL web certificates into workflow",
-  },
-  {
-    id: "12",
-    columnId: "doing",
-    content: "Implement error logging and monitoring",
-  },
-  {
-    id: "13",
-    columnId: "doing",
-    content: "Design and implement responsive UI",
-  },
+    {
+        id: "1",
+        columnId: "todo",
+        content: "List admin APIs for dashboard",
+    },
+    {
+        id: "2",
+        columnId: "todo",
+        content:
+            "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
+    },
+    {
+        id: "3",
+        columnId: "doing",
+        content: "Conduct security testing",
+    },
+    {
+        id: "4",
+        columnId: "doing",
+        content: "Analyze competitors",
+    },
+    {
+        id: "5",
+        columnId: "done",
+        content: "Create UI kit documentation",
+    },
+    {
+        id: "6",
+        columnId: "done",
+        content: "Dev meeting",
+    },
+    {
+        id: "7",
+        columnId: "done",
+        content: "Deliver dashboard prototype",
+    },
+    {
+        id: "8",
+        columnId: "todo",
+        content: "Optimize application performance",
+    },
+    {
+        id: "9",
+        columnId: "todo",
+        content: "Implement data validation",
+    },
+    {
+        id: "10",
+        columnId: "todo",
+        content: "Design database schema",
+    },
+    {
+        id: "11",
+        columnId: "todo",
+        content: "Integrate SSL web certificates into workflow",
+    },
+    {
+        id: "12",
+        columnId: "doing",
+        content: "Implement error logging and monitoring",
+    },
+    {
+        id: "13",
+        columnId: "doing",
+        content: "Design and implement responsive UI",
+    },
 ];
 
 function KanbanBoard() {
-  const [columns, setColumns] = useState<Column[]>(defaultCols);
-  const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
+    const [columns, setColumns] = useState<Column[]>(defaultCols);
+    const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
+    const [tasks, setTasks] = useState<Task[]>(defaultTasks);
 
-  const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+    const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
+    const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    })
-  );
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 10,
+            },
+        })
+    );
 
-  return (
-    <div
-      className="
+    return (
+        <div
+            className="
         m-auto
-        flex
+        
         min-h-screen
         w-full
         items-center
         overflow-x-auto
         overflow-y-hidden
         px-[40px]
+        bg-white
     "
-    >
-      <DndContext
-        sensors={sensors}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-      >
-        <div className="m-auto flex gap-4">
-          <div className="flex gap-4">
-            <SortableContext items={columnsId}>
-              {columns.map((col) => (
-                <ColumnContainer
-                  key={col.id}
-                  column={col}
-                  deleteColumn={deleteColumn}
-                  updateColumn={updateColumn}
-                  createTask={createTask}
-                  deleteTask={deleteTask}
-                  updateTask={updateTask}
-                  tasks={tasks.filter((task) => task.columnId === col.id)}
-                />
-              ))}
-            </SortableContext>
-          </div>
-          <button
-            onClick={() => {
-              createNewColumn();
-            }}
-            className="
-      h-[60px]
-      w-[350px]
-      min-w-[350px]
-      cursor-pointer
-      rounded-lg
-      bg-mainBackgroundColor
-      border-2
-      border-columnBackgroundColor
-      p-4
-      ring-rose-500
-      hover:ring-2
-      flex
-      gap-2
-      "
-          >
-            <PlusIcon />
-            Add Column
-          </button>
+        >
+            <div className="flex text-black px-10 pt-20">
+                <div className="flex text-black w-1/2  gap-4">
+                    <button className="border border-solid border-black w-40 rounded-xl bg-gray-300">
+                        CREATE
+                    </button>
+                    <button className="border-[2px] border-solid border-black w-40 rounded-xl">
+                        UPDATE
+                    </button>
+                </div>
+                <div>
+                    <h3 className="text-2xl mb-2">CALENDAR</h3>
+                </div>
+            </div>
+            <div className="flex flex-col  items-center h-[80vh] mx-4 mb-10 border border-solid border-black">
+                <div>
+                    <div className="text-black">
+                        <p className="text-center ml-24 text-lg">2023-09-06</p>
+                    </div>
+                    <div className="text-black flex justify-end gap-2">
+                        <span> Choosen</span>
+                        <select
+                            name="lang"
+                            id="lang-select"
+                            className="border border-solid border-black w-[200px] mb-10"
+                        >
+                            <option value="">--Choosen a day--</option>
+                            <option value="csharp">C#</option>
+                            <option value="cpp">C++</option>
+                            <option value="php">PHP</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="js">Javascript</option>
+                            <option value="dart">Dart</option>
+                        </select>
+                    </div>
+                    <DndContext
+                        sensors={sensors}
+                        onDragStart={onDragStart}
+                        onDragEnd={onDragEnd}
+                        onDragOver={onDragOver}
+                    >
+                        <div className="m-auto flex justify-between">
+                            <div className="grid grid-cols-7 grid-rows-2 justify-between border border-solid border-gray-400">
+                                <SortableContext items={columnsId}>
+                                    {columns.map(
+                                        (col) =>
+                                            col.id !== 0 &&
+                                            col.id !== 15 && (
+                                                <ColumnContainer
+                                                    key={col.id}
+                                                    column={col}
+                                                    deleteColumn={deleteColumn}
+                                                    updateColumn={updateColumn}
+                                                    createTask={createTask}
+                                                    deleteTask={deleteTask}
+                                                    updateTask={updateTask}
+                                                    tasks={tasks.filter(
+                                                        (task) =>
+                                                            task.columnId ===
+                                                            col.id
+                                                    )}
+                                                />
+                                            )
+                                    )}
+                                </SortableContext>
+                            </div>
+                        </div>
+
+                        {createPortal(
+                            <DragOverlay>
+                                {activeColumn && (
+                                    <ColumnContainer
+                                        column={activeColumn}
+                                        deleteColumn={deleteColumn}
+                                        updateColumn={updateColumn}
+                                        createTask={createTask}
+                                        deleteTask={deleteTask}
+                                        updateTask={updateTask}
+                                        tasks={tasks.filter(
+                                            (task) =>
+                                                task.columnId ===
+                                                activeColumn.id
+                                        )}
+                                    />
+                                )}
+                                {activeTask && (
+                                    <TaskCard
+                                        task={activeTask}
+                                        deleteTask={deleteTask}
+                                        updateTask={updateTask}
+                                    />
+                                )}
+                            </DragOverlay>,
+                            document.body
+                        )}
+                    </DndContext>
+                    <div className="text-black pl-20 flex gap-x-48">
+                        <button className="w-[200px] border border-solid border-black rounded-xl h-[40px] mt-5">
+                            SAVE
+                        </button>
+                        <div className="flex gap-32 mt-5">
+                            {/* Nút "Prev" (Trang trước) */}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="40"
+                                viewBox="0 0 6.016 10.015"
+                            >
+                                <path
+                                    id="shitayazirushi"
+                                    d="M5.23,7.21a.75.75,0,0,1,1.06.02L10,11.168,13.71,7.23a.75.75,0,1,1,1.08,1.04l-4.25,4.5a.75.75,0,0,1-1.08,0L5.21,8.27a.75.75,0,0,1,.02-1.06Z"
+                                    transform="translate(13 -5) rotate(90)"
+                                    fill="#6b7280"
+                                    fill-rule="evenodd"
+                                />
+                            </svg>
+
+                            {/* Nút "Next" (Trang sau) */}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="30"
+                                height="40"
+                                viewBox="0 0 6.016 10.015"
+                            >
+                                <path
+                                    id="shitayazirushi"
+                                    d="M5.23,7.21a.75.75,0,0,1,1.06.02L10,11.168,13.71,7.23a.75.75,0,1,1,1.08,1.04l-4.25,4.5a.75.75,0,0,1-1.08,0L5.21,8.27a.75.75,0,0,1,.02-1.06Z"
+                                    transform="translate(-6.984 15.016) rotate(-90)"
+                                    fill="#6b7280"
+                                    fill-rule="evenodd"
+                                />
+                            </svg>
+                        </div>
+                        <button className="w-[200px] text-white border border-solid border-black rounded-xl h-[40px] mt-5 bg-black">
+                            SAVE
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
+    );
 
-        {createPortal(
-          <DragOverlay>
-            {activeColumn && (
-              <ColumnContainer
-                column={activeColumn}
-                deleteColumn={deleteColumn}
-                updateColumn={updateColumn}
-                createTask={createTask}
-                deleteTask={deleteTask}
-                updateTask={updateTask}
-                tasks={tasks.filter(
-                  (task) => task.columnId === activeColumn.id
-                )}
-              />
-            )}
-            {activeTask && (
-              <TaskCard
-                task={activeTask}
-                deleteTask={deleteTask}
-                updateTask={updateTask}
-              />
-            )}
-          </DragOverlay>,
-          document.body
-        )}
-      </DndContext>
-    </div>
-  );
+    function createTask(columnId: Id) {
+        const newTask: Task = {
+            id: generateId(),
+            columnId,
+            content: `Task ${tasks.length + 1}`,
+        };
 
-  function createTask(columnId: Id) {
-    const newTask: Task = {
-      id: generateId(),
-      columnId,
-      content: `Task ${tasks.length + 1}`,
-    };
-
-    setTasks([...tasks, newTask]);
-  }
-
-  function deleteTask(id: Id) {
-    const newTasks = tasks.filter((task) => task.id !== id);
-    setTasks(newTasks);
-  }
-
-  function updateTask(id: Id, content: string) {
-    const newTasks = tasks.map((task) => {
-      if (task.id !== id) return task;
-      return { ...task, content };
-    });
-
-    setTasks(newTasks);
-  }
-
-  function createNewColumn() {
-    const columnToAdd: Column = {
-      id: generateId(),
-      title: `Column ${columns.length + 1}`,
-    };
-
-    setColumns([...columns, columnToAdd]);
-  }
-
-  function deleteColumn(id: Id) {
-    const filteredColumns = columns.filter((col) => col.id !== id);
-    setColumns(filteredColumns);
-
-    const newTasks = tasks.filter((t) => t.columnId !== id);
-    setTasks(newTasks);
-  }
-
-  function updateColumn(id: Id, title: string) {
-    const newColumns = columns.map((col) => {
-      if (col.id !== id) return col;
-      return { ...col, title };
-    });
-
-    setColumns(newColumns);
-  }
-
-  function onDragStart(event: DragStartEvent) {
-    if (event.active.data.current?.type === "Column") {
-      setActiveColumn(event.active.data.current.column);
-      return;
+        setTasks([...tasks, newTask]);
     }
 
-    if (event.active.data.current?.type === "Task") {
-      setActiveTask(event.active.data.current.task);
-      return;
+    function deleteTask(id: Id) {
+        const newTasks = tasks.filter((task) => task.id !== id);
+        setTasks(newTasks);
     }
-  }
 
-  function onDragEnd(event: DragEndEvent) {
-    setActiveColumn(null);
-    setActiveTask(null);
+    function updateTask(id: Id, content: string) {
+        const newTasks = tasks.map((task) => {
+            if (task.id !== id) return task;
+            return { ...task, content };
+        });
 
-    const { active, over } = event;
-    if (!over) return;
+        setTasks(newTasks);
+    }
 
-    const activeId = active.id;
-    const overId = over.id;
+    function createNewColumn() {
+        const columnToAdd: Column = {
+            id: generateId(),
+            title: `Column ${columns.length + 1}`,
+        };
 
-    if (activeId === overId) return;
+        setColumns([...columns, columnToAdd]);
+    }
 
-    const isActiveAColumn = active.data.current?.type === "Column";
-    if (!isActiveAColumn) return;
+    function deleteColumn(id: Id) {
+        const filteredColumns = columns.filter((col) => col.id !== id);
+        setColumns(filteredColumns);
 
-    console.log("DRAG END");
+        const newTasks = tasks.filter((t) => t.columnId !== id);
+        setTasks(newTasks);
+    }
 
-    setColumns((columns) => {
-      const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
+    function updateColumn(id: Id, title: string) {
+        const newColumns = columns.map((col) => {
+            if (col.id !== id) return col;
+            return { ...col, title };
+        });
 
-      const overColumnIndex = columns.findIndex((col) => col.id === overId);
+        setColumns(newColumns);
+    }
 
-      return arrayMove(columns, activeColumnIndex, overColumnIndex);
-    });
-  }
-
-  function onDragOver(event: DragOverEvent) {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
-    if (activeId === overId) return;
-
-    const isActiveATask = active.data.current?.type === "Task";
-    const isOverATask = over.data.current?.type === "Task";
-
-    if (!isActiveATask) return;
-
-    // Im dropping a Task over another Task
-    if (isActiveATask && isOverATask) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        const overIndex = tasks.findIndex((t) => t.id === overId);
-
-        if (tasks[activeIndex].columnId != tasks[overIndex].columnId) {
-          // Fix introduced after video recording
-          tasks[activeIndex].columnId = tasks[overIndex].columnId;
-          return arrayMove(tasks, activeIndex, overIndex - 1);
+    function onDragStart(event: DragStartEvent) {
+        if (event.active.data.current?.type === "Column") {
+            setActiveColumn(event.active.data.current.column);
+            return;
         }
 
-        return arrayMove(tasks, activeIndex, overIndex);
-      });
+        if (event.active.data.current?.type === "Task") {
+            setActiveTask(event.active.data.current.task);
+            return;
+        }
     }
 
-    const isOverAColumn = over.data.current?.type === "Column";
+    function onDragEnd(event: DragEndEvent) {
+        setActiveColumn(null);
+        setActiveTask(null);
 
-    // Im dropping a Task over a column
-    if (isActiveATask && isOverAColumn) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
+        const { active, over } = event;
+        if (!over) return;
 
-        tasks[activeIndex].columnId = overId;
-        console.log("DROPPING TASK OVER COLUMN", { activeIndex });
-        return arrayMove(tasks, activeIndex, activeIndex);
-      });
+        const activeId = active.id;
+        const overId = over.id;
+
+        if (activeId === overId) return;
+
+        const isActiveAColumn = active.data.current?.type === "Column";
+        if (!isActiveAColumn) return;
+
+        console.log("DRAG END");
+
+        setColumns((columns) => {
+            const activeColumnIndex = columns.findIndex(
+                (col) => col.id === activeId
+            );
+
+            const overColumnIndex = columns.findIndex(
+                (col) => col.id === overId
+            );
+
+            return arrayMove(columns, activeColumnIndex, overColumnIndex);
+        });
     }
-  }
+
+    function onDragOver(event: DragOverEvent) {
+        const { active, over } = event;
+        if (!over) return;
+
+        const activeId = active.id;
+        const overId = over.id;
+
+        if (activeId === overId) return;
+
+        const isActiveATask = active.data.current?.type === "Task";
+        const isOverATask = over.data.current?.type === "Task";
+
+        if (!isActiveATask) return;
+
+        // Im dropping a Task over another Task
+        if (isActiveATask && isOverATask) {
+            setTasks((tasks) => {
+                const activeIndex = tasks.findIndex((t) => t.id === activeId);
+                const overIndex = tasks.findIndex((t) => t.id === overId);
+
+                if (tasks[activeIndex].columnId != tasks[overIndex].columnId) {
+                    // Fix introduced after video recording
+                    tasks[activeIndex].columnId = tasks[overIndex].columnId;
+                    return arrayMove(tasks, activeIndex, overIndex - 1);
+                }
+
+                return arrayMove(tasks, activeIndex, overIndex);
+            });
+        }
+
+        const isOverAColumn = over.data.current?.type === "Column";
+
+        // Im dropping a Task over a column
+        if (isActiveATask && isOverAColumn) {
+            setTasks((tasks) => {
+                const activeIndex = tasks.findIndex((t) => t.id === activeId);
+
+                tasks[activeIndex].columnId = overId;
+                console.log("DROPPING TASK OVER COLUMN", { activeIndex });
+                return arrayMove(tasks, activeIndex, activeIndex);
+            });
+        }
+    }
 }
 
 function generateId() {
-  /* Generate a random number between 0 and 10000 */
-  return Math.floor(Math.random() * 10001);
+    /* Generate a random number between 0 and 10000 */
+    return Math.floor(Math.random() * 10001);
 }
 
 export default KanbanBoard;
