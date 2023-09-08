@@ -32,68 +32,68 @@ import { createArrayOfObjects, flattenArray } from "../components/utils/index";
 const defaultTasks: Task[] = [
   {
     id: "1",
-    columnId: "todo",
+    columnId: "2023/09/06",
     content: "List admin APIs for dashboard",
   },
   {
     id: "2",
-    columnId: "todo",
+    columnId: "2023/09/06",
     content:
       "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
   },
   {
     id: "3",
-    columnId: "doing",
+    columnId: "2023/09/07",
     content: "Conduct security testing",
   },
   {
     id: "4",
-    columnId: "doing",
+    columnId: "2023/09/08",
     content: "Analyze competitors",
   },
   {
     id: "5",
-    columnId: "done",
+    columnId: "2023/10/10",
     content: "Create UI kit documentation",
   },
   {
     id: "6",
-    columnId: "done",
+    columnId: "2023/09/03",
     content: "Dev meeting",
   },
   {
     id: "7",
-    columnId: "done",
+    columnId: "2023/09/05",
     content: "Deliver dashboard prototype",
   },
   {
     id: "8",
-    columnId: "todo",
+    columnId: "2023/09/20",
     content: "Optimize application performance",
   },
   {
     id: "9",
-    columnId: "todo",
+    columnId: "2023/09/16",
     content: "Implement data validation",
   },
   {
     id: "10",
-    columnId: "todo",
+    columnId: "2023/09/22",
     content: "Design database schema",
   },
   {
     id: "11",
-    columnId: "todo",
+    columnId: "2023/10/11",
     content: "Integrate SSL web certificates into workflow",
   },
   {
     id: "12",
-    columnId: "doing",
+    columnId: "2023/11/04",
     content: "Implement error logging and monitoring",
   },
   {
     id: "13",
-    columnId: "doing",
+    columnId: "2023/11/05",
     content: "Design and implement responsive UI",
   },
 ];
